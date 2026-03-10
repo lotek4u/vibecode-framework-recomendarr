@@ -1,0 +1,25 @@
+services:
+  recommendarr:
+    build:
+      context: ..
+      dockerfile: Docker/Dockerfile
+    container_name: recommendarr
+    ports:
+      - "5000:5000"
+    volumes:
+      - ../config:/config
+      # Uncomment and adjust paths below for local media scanning (read-only).
+      # These must match the paths set in config.yaml under local_media.
+      # SMB UNC paths on Windows should use forward slashes and be quoted.
+      # If Docker Desktop cannot access UNC directly, map these shares to drive
+      # letters in Windows and use paths like M:/ and T:/ instead.
+      # - "//server/music:/data/media/MP3s:ro"
+      # - "//server/movies:/data/movies:ro"
+      # - "//server/tv:/data/tv:ro"
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - CONFIG_PATH=/config/config.yaml
+      - DB_PATH=/config/recommendarr.db

@@ -1,0 +1,179 @@
+# recommendarr configuration
+# Copy this file to config.yaml and fill in your values.
+
+# -------------------------------------------------------------------------
+# STREAMING SERVICES
+# Set to true for any service you have a subscription to.
+# Links appear on every music recommendation and explorer card.
+# No API keys required — these are just search links.
+# -------------------------------------------------------------------------
+streaming_services:
+  spotify:       false
+  apple_music:   false
+  youtube_music: false
+  bandcamp:      false
+
+# -------------------------------------------------------------------------
+# GENERAL
+# -------------------------------------------------------------------------
+sync_interval_hours: 24
+max_recommendations: 20
+
+# -------------------------------------------------------------------------
+# INFRASTRUCTURE SERVICES
+# Metadata providers and library managers used by the recommendation engine.
+# These are system-level tools, not tied to any person or taste profile.
+# -------------------------------------------------------------------------
+infrastructure:
+
+  musicbrainz:
+    # Completely free music metadata. No API key needed.
+    enabled: true
+
+  tmdb:
+    # The Movie Database — movie/TV discovery and metadata.
+    # Free API key: https://www.themoviedb.org/settings/api
+    enabled: false
+    api_key: ""
+
+  tvdb:
+    # TheTVDB — additional TV metadata.
+    # Free API key: https://thetvdb.com/api-information
+    enabled: false
+    api_key: ""
+
+  radarr:
+    # Movie library manager. Prevents already-owned movies from being
+    # re-recommended, and provides "Add to Radarr" links in the explorer.
+    # Not a scrobble source — no per-user watch history.
+    # API key: Radarr → Settings → General → Security
+    enabled: false
+    url: "http://localhost:7878"
+    api_key: ""
+
+  sonarr:
+    # TV library manager. Same purpose as Radarr for TV shows.
+    # Not a scrobble source — no per-user watch history.
+    # API key: Sonarr → Settings → General → Security
+    enabled: false
+    url: "http://localhost:8989"
+    api_key: ""
+
+  lidarr:
+    # Music library manager. Not a scrobble source.
+    # API key: Lidarr → Settings → General → Security
+    enabled: false
+    url: "http://localhost:8686"
+    api_key: ""
+
+# -------------------------------------------------------------------------
+# TASTE PROFILES
+# One entry per person. Each profile has its own data sources.
+#
+# TWO-LAYER MODEL:
+#   1. Create the user in the web UI first (User Profiles page).
+#   2. Add an entry here with the EXACT same name to attach API credentials
+#      and data sources to that user.
+#
+# Profiles defined here but not yet in the DB will appear as "Import User"
+# on the User Profiles page — click the button to create them instantly.
+# Profiles in the DB with no entry here will show a "No sources" warning.
+#
+# The entry with default: true (or the first entry) is used by global routes
+# (e.g. /profile, /recommendations) until per-user scoping is added.
+# -------------------------------------------------------------------------
+profiles:
+
+  - name: "Me"
+    default: true
+    sources:
+
+      lastfm:
+        # Free API key: https://www.last.fm/api/account/create
+        enabled: false
+        api_key: ""
+        username: ""
+
+      listenbrainz:
+        # Free, open-source. No API key needed.
+        enabled: false
+        username: ""
+
+      plex:
+        enabled: false
+        url: "http://localhost:32400"
+        import_rated: true       # Items you've star-rated (best signal)
+        import_playlists: true   # Items in your playlists
+        import_watched: false    # Everything you've watched (can be large)
+        min_rating: 0            # Minimum star rating to import (0 = all rated items)
+        token: ""
+        db_path: ""
+        # Plex libraries to treat as scrobbling history.
+        # Each entry must declare its media_type: music | movies | tv
+        scrobble_libraries: []
+        # scrobble_libraries:
+        #   - name: "Music"
+        #     media_type: music
+        #   - name: "Movies"
+        #     media_type: movies
+        #   - name: "TV Shows"
+        #     media_type: tv
+
+      watcharr:
+        # Self-hosted watch tracker (https://github.com/sbondCo/Watcharr).
+        # Watcharr aggregates data from multiple upstream sources internally:
+        #   TMDB (all media metadata), Trakt, IMDb, Movary, MyAnimeList, Ryot, TodoMovies.
+        # If Watcharr is enabled here, do NOT also enable TMDB account scrobbling
+        # for the same user — Watcharr already holds that watch history.
+        enabled: false
+        url: "http://localhost:3003"
+        username: ""
+        password: ""
+
+      youtube:
+        # YouTube Data API v3. Free API key from Google Cloud Console.
+        # https://console.cloud.google.com → APIs & Services → YouTube Data API v3
+        enabled: false
+        api_key: ""
+        # Google Takeout watch history import. No API key needed.
+        # Download at takeout.google.com, select YouTube, copy watch-history.json
+        # to /config/youtube-history.json, then use the Import button in the UI.
+        import_history_enabled: true
+
+      # TMDB personal account (optional — imports your rated movies/TV and watchlist).
+      # The infrastructure API key is used for API calls; only session_id is personal.
+      # Obtain a session_id via TMDB's auth flow (see docs for details).
+      tmdb:
+        scrobble_enabled: false
+        session_id: ""
+        username: ""
+
+      # TVDB personal account (optional — imports your favourites and ratings).
+      # The infrastructure API key is combined with your user_pin to authenticate.
+      # Find your user_pin at: https://thetvdb.com/dashboard/account/apikey
+      tvdb:
+        scrobble_enabled: false
+        user_pin: ""
+
+      local_media:
+        # Fallback for users without Plex. Scans mounted directories for
+        # music, movie, and TV files. No play history — file presence is
+        # treated as a taste signal only. Use Plex instead if available.
+        enabled: false
+        music_path: "/data/music"    # leave blank to skip
+        movies_path: "/data/movies"  # leave blank to skip
+        tv_path: "/data/tv"          # leave blank to skip
+
+  # Example second profile (uncomment and fill in to add a family member):
+  # - name: "Partner"
+  #   sources:
+  #     plex:
+  #       enabled: true
+  #       url: "http://localhost:32400"
+  #       token: "their-token-here"
+  #       import_rated: true
+  #       import_watched: true
+  #     lastfm:
+  #       enabled: false
+  #       api_key: ""
+  #       username: ""

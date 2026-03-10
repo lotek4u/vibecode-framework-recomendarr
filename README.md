@@ -1,12 +1,6 @@
 # Please read this part
 # Please read this part
 # Please read this part
-# Please read this part
-# Please read this part
-# Please read this part
-# Please read this part
-                                                 
-
 
 
 # vibecode-framework-recomendarr
@@ -20,19 +14,10 @@ It's going to create what you specify, specify what you want. My exact specifica
 
 **EXAMPLE** - In the CLAUDE_README.md file, the colors and layout are specific in demanding detail. You may want to prune or modify this section.
 
-
-
-
                                                             
 # The slop-structions begin here
 # The slop-structions begin here
 # The slop-structions begin here
-# The slop-structions begin here
-# The slop-structions begin here
-# The slop-structions begin here
-# The slop-structions begin here
-# The slop-structions begin here
-
 
 
 ## vibecode-framework-recommendarr - intro

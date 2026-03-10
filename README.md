@@ -4,8 +4,6 @@
 # Note from LoTek
 I'm trying something new here. I built a great app called recomendarr that meets my demanding needs for a media recommender. Rather than poisoning the world with more vibe coded slop, i've created an outline that SHOULD help you create a copy of this application.
 
-Feed this to your sloppinator. Tell it to read the Claude file and hope for the best.
-
 **Before you do anything — read all of the markdown in this project.** That means this file, everything in [`architecture/`](architecture/), the READMEs inside [`config/imported_data/`](config/imported_data/), and any other `.md` files you find. The whole picture matters. Don't just skim the overview and start generating code — the context is spread across multiple files intentionally.
 
 It's going to create what you specify, specify what you want. My exact specifications might not be what you're looking for.
@@ -17,7 +15,7 @@ It's going to create what you specify, specify what you want. My exact specifica
 #
 # The slop-structions begin here
 #
-#
+## Feed this to your sloppinator. Tell it to read the Claude file and hope for the best.
 #
 ## vibecode-framework-recommendarr - intro
 

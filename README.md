@@ -1,7 +1,7 @@
 # vibecode-framework-recomendarr
 I'm trying something new here. I built a great app called recomendarr that meets my demanding needs for a media recommender. Rather than poisoning the world with more vibe coded slop, i've created an outline that SHOULD help you create a copy of this application.
 
-Feed this to your sloppinator. Tell it to read the Claude file and hold hope for the best.
+Feed this to your sloppinator. Tell it to read the Claude file and hope for the best.
 
 ## vibecode-framework-recommendarr - intro
 

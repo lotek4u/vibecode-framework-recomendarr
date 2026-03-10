@@ -84,7 +84,7 @@ infrastructure:
 # -------------------------------------------------------------------------
 profiles:
 
-  - name: "Me"
+  - name: "Default"
     default: true
     sources:
 

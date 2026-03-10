@@ -33,17 +33,6 @@ All architectural documentation lives in the [`architecture/`](architecture/) fo
 | [`architecture/RECOMMENDARR_OVERVIEW.md`](architecture/RECOMMENDARR_OVERVIEW.md) | Full feature specification — every page, interaction, data source, taste profile algorithm, recommendation engine, and explorer is described here. Treat it as the product requirements document. |
 | [`architecture/TEST_CASES.md`](architecture/TEST_CASES.md) | Acceptance test suite — user-story-style test cases grouped by feature. The implementation is considered correct when every test case passes. **These may be overkill.** Consider starting without them entirely, or pruning them down to the features you actually care about before feeding to your agent. |
 
----
-
-## Running with Docker
-
-```bash
-cp config/config.yaml.example config/config.yaml
-# edit config/config.yaml with your settings
-docker compose -f Docker/docker-compose.yml up -d
-```
-
-The app will be available at `http://localhost:5000`.
 
 ---
 

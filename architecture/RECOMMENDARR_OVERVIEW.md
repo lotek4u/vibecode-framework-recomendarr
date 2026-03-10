@@ -105,7 +105,7 @@ The Status page has two sections:
 The User Profiles page is a management hub with two columns:
 
 **Left column — User list:**
-- Create new user profiles with a name (e.g. "Nick", "Partner", "Kid")
+- Create new user profiles with a name (e.g. "Default", "Partner", "Kid")
 - Each profile row shows: avatar initial, name, scrobble count, creation date, and tag counts per category (e.g. "42 music tags · 18 movie tags")
 - Clicking a profile row navigates to the user detail page
 - Each row has inline Rename, Activate/Deactivate, and Delete actions

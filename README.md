@@ -10,6 +10,31 @@ It's going to create what you specify, specify what you want. My exact specifica
 
 **EXAMPLE 1** - In the CLAUDE_README.md file, the colors and layout are specific in demanding detail. You may want to prune or modify this section.
 **EXAMPLE 2** - The test cases, onsider starting without them entirely, or pruning them down to the features you actually care about before feeding to your agent.
+
+## How to Get Claude Code Running
+
+Claude Code is Anthropic's official agentic coding CLI. It runs in your terminal and gives Claude direct access to your filesystem, shell, and editor so it can read code, write files, run commands, and work through complex tasks autonomously.
+
+The official documentation is at: https://docs.anthropic.com/en/docs/claude-code/overview
+
+**Install it with npm:**
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+**Then run it from your project directory:**
+```bash
+claude
+```
+
+**You will need an Anthropic API key. Set it as an environment variable:**
+```bash
+export ANTHROPIC_API_KEY=your_key_here
+```
+
+Or add it to your shell profile so it persists across sessions.
+
+---
 #
 #
 #

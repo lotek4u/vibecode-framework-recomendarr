@@ -162,9 +162,9 @@ Mark a TODO `Complete` only when every item on its checklist is done and every l
 
 When working through a TODO and you encounter a decision that is out of scope for the current phase, do not make it. Add it to the **Deferred Decisions** section of the current TODO, describe the decision and which future TODO it belongs to, and move on.
 
-> **Example:** On Phase 3 (user profiles), you realize you need to decide how per-user Plex tokens are stored and validated — but that belongs to Phase 5 (connectors). Write: *"Plex token storage format deferred to TODO-005. For now, store as a plain string in the user sources config table."* Then continue.
+> **Example:** On Phase 3 (user profiles), you realize the exact UI flow for renaming a profile is not yet fully specified — but that belongs to Phase 9 (UI polish). Write: *"Rename interaction details deferred to TODO-009."* Then continue.
 
-Do not go back and reopen a completed TODO to satisfy a deferred decision from a later phase unless the earlier code is provably broken. If it works, leave it.
+**Exception — security decisions are never deferred.** If the out-of-scope decision involves credential storage, authentication, authorization, secrets, tokens, or any other security concern, do not defer it and do not choose a placeholder implementation. Make the secure choice immediately, implement it correctly, and update the future TODO where it was originally planned to note that the decision has already been made and implemented. Insecure placeholder code has a way of surviving into production. Do not write it.
 
 ---
 

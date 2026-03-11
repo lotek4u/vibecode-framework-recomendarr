@@ -17,24 +17,20 @@ Claude Code is Anthropic's official agentic coding CLI. It runs in your terminal
 
 The official documentation is at: https://docs.anthropic.com/en/docs/claude-code/overview
 
-**Install it with npm:**
-```bash
-npm install -g @anthropic-ai/claude-code
-```
-
-**Then run it from your project directory:**
-```bash
-claude
-```
-
-**You will need an Anthropic API key. Set it as an environment variable:**
-```bash
-export ANTHROPIC_API_KEY=your_key_here
-```
-
-Or add it to your shell profile so it persists across sessions.
+### Environment recomendations
+- If you have a native Linux of MacOS device, use that
+- If you are stuck on Windows (like me), use WSL2
+- If you can't use WSL 2 on windows, or for any other weird scenario, run Claude Code in a container.
 
 ---
+
+### Claude Code Notes
+- There is no GUI, if you're looking for that, you have the wrong app.
+- It's native to Linux, it's easiest to use in Linux, but once it's running, OS doesn't matter.
+
+---
+
+
 #
 #
 #

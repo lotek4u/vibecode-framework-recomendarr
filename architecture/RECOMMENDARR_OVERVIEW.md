@@ -12,6 +12,8 @@ The core philosophy is **local-first data ownership**: all scrobble history is s
 
 The app integrates with the popular *arr suite (Radarr, Sonarr, Lidarr) so you can go from "I got a recommendation" to "it's downloading" in a single click.
 
+**Scrobbling** - As it pertains to this project, all media is eligble for scrobbling when the user watches it. Typically, this term only refers to audio logging, but in the context of 'recommendarr', scrobbling is possible with music, movies, and tv shows. This is a key concept used throughout the project to make proper recommendations without constantly querying the scrobbling source.
+
 ---
 
 ## Visual Design & Layout
@@ -94,7 +96,7 @@ Each tag appears as a row with:
 
 Clicking a bar saves the override instantly via AJAX (no page reload). Clicking the currently-active bar resets it back to neutral. A small "Saved" toast confirmation appears at the bottom-right.
 
-**Grounding Tags:** At the bottom of each category card is an "Add grounding tag" form. This is one of the most powerful features: you can manually pin a genre or style tag into your profile even if the system hasn't learned it yet from your history. For example, you could ground your music profile with "shoegaze" or "lo-fi" to steer recommendations toward content you know you like but might not have much history for yet. You set an initial weight using the same 5-bar picker. Grounding tags are pinned permanently — they won't be removed by re-syncs — and are displayed separately with a pin icon. Once a sync has processed them, they appear alongside the computed tags and can be removed at any time.
+**Grounding Tags:** At the bottom of each category card is an "Add grounding tag" form. This is one of the most powerful features: you can manually pin a genre or style tag into your profile even if the system hasn't learned it yet from your history. For example, you could ground your music profile with "shoegaze" or "lo-fi" to steer recommendations toward content you know you like but might not have much history for yet. You set an initial weight using the same 5-bar picker. Grounding tags are pinned permanently — they won't be removed by re-syncs — and are displayed separately with a pin icon. Once a sync has processed them, they appear alongside the computed tags and can be removed at any time and the algorithm should stop using disabled tags.
 
 ### YouTube Playlists
 A `/playlists` page for managing YouTube playlists as per-user taste signals. Playlists are scoped to a user profile — each user can have their own set. From this page you can add playlist IDs, remove them, enable/disable individual playlists, and trigger a Google Takeout watch-history JSON import. Enabled playlists are synced on each regular sync cycle and their video watch history contributes to that user's taste profile.
@@ -102,7 +104,7 @@ A `/playlists` page for managing YouTube playlists as per-user taste signals. Pl
 ### Utilities
 A utilities page with maintenance actions:
 - **Clear API cache** — purges all cached API responses so the next sync fetches fresh data from all external services
-- **Purge source data** — remove all data ingested from a specific service (e.g. purge all Last.fm data, or all Plex data) without affecting data from other sources. Useful when re-configuring a source or switching accounts.
+- **Purge source data** — remove all data ingested from a specific service (e.g. purge all Last.fm data per user, or all Plex data per user) without affecting data from other sources. Useful when re-configuring a source or switching accounts.
 
 ### Status
 The Status page has two sections:
@@ -162,10 +164,12 @@ The app supports multiple sources per user, and each source can be independently
 ### Music Sources
 
 **Last.fm CSV Export:**
-The primary way to import music history. Export your scrobble history from `lastfm.ghan.nl/export` and drop the CSV file into `config/imported_data/last.fm/`. The app scans this directory automatically. You assign each file to a user and click Import. The app reads every row (timestamp, artist, album, track) and stores it in a local scrobble history table. Multiple CSVs can be imported for the same user — useful for importing history from multiple Last.fm accounts or re-importing after corrections.
+The primary way to get your full scrobble history into the app. Export your complete history from `lastfm.ghan.nl/export` and drop the CSV file into `config/imported_data/last.fm/`. The app scans this directory automatically. You assign each file to a user and click Import. The app reads every row (timestamp, artist, album, track) and stores it in a local scrobble history table. Multiple CSVs can be imported for the same user — useful for importing history from multiple Last.fm accounts or re-importing after corrections.
+
+> **Do this first.** Export and import your full Last.fm CSV history before enabling the live API sync below. The CSV gives you your complete historical record; the live API only fetches recent scrobbles going forward. If you skip the CSV export and go straight to the API, you will lose all your older history. Do the export early — it takes a few minutes and you only have to do it once.
 
 **Last.fm API (live sync):**
-If you configure a Last.fm API key and username in a user's sources, the app can pull recent scrobbles directly from the Last.fm API on each sync. This supplements CSV imports with up-to-date listening data.
+Once your historical CSV is imported, add a Last.fm API key and username to a user's sources to keep scrobbles flowing in automatically. On every sync cycle the app pulls any new scrobbles from the Last.fm API and appends them to the local database, so your taste profile stays current without any manual exports. This is meant to run alongside the CSV import, not replace it — the CSV covers your history, the API covers everything from now on.
 
 **ListenBrainz:**
 An open-source alternative to Last.fm. Configure a user's ListenBrainz username and the app syncs their recent listens.

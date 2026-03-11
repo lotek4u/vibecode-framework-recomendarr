@@ -33,8 +33,7 @@ The official documentation is at: https://docs.anthropic.com/en/docs/claude-code
 
 ### Environment recomendations
 - If you have a native Linux of MacOS device, use that
-- If you are stuck on Windows (like me), use WSL2
-- If you can't use WSL 2 on windows, or for any other weird scenario, run Claude Code in a container.
+- If you are on Windows, install with 'winget install Anthropic.ClaudeCode' from an admin prompt.
 
 ---
 

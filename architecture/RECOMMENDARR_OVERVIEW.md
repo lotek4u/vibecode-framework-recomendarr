@@ -26,6 +26,8 @@ The app uses Bootstrap 5 for layout with heavily customized components. Bootstra
 - **Music Explorer** — interactive band/artist graph browser
 - **Movie Explorer** — interactive movie graph browser
 - **TV Explorer** — interactive TV show graph browser
+- **Playlists** — manage YouTube playlists and import watch history
+- **Utilities** — cache and source data management
 - Username + Logout button (when authentication is enabled)
 - The "recommendarr" brand name on the right
 
@@ -58,7 +60,7 @@ The recommendations page shows a responsive grid of recommendation cards (6 acro
 - A **Dismiss** button to permanently remove a recommendation
 
 **Action buttons per type:**
-- *Music (artist/album):* Streaming service links (Spotify, Apple Music, YouTube Music, Tidal, Amazon Music — configurable), a YouTube preview button, and a Lidarr add button
+- *Music (artist/album):* Streaming service links (Spotify, Apple Music, YouTube Music, Tidal, Amazon Music, Bandcamp — configurable), a YouTube preview button, and a Lidarr add button
 - *Movies:* TMDb link, Metacritic, IMDb, JustWatch, and a Radarr add button
 - *TV Shows:* TMDb link, Metacritic, TVDB, JustWatch, and a Sonarr add button
 
@@ -93,6 +95,14 @@ Each tag appears as a row with:
 Clicking a bar saves the override instantly via AJAX (no page reload). Clicking the currently-active bar resets it back to neutral. A small "Saved" toast confirmation appears at the bottom-right.
 
 **Grounding Tags:** At the bottom of each category card is an "Add grounding tag" form. This is one of the most powerful features: you can manually pin a genre or style tag into your profile even if the system hasn't learned it yet from your history. For example, you could ground your music profile with "shoegaze" or "lo-fi" to steer recommendations toward content you know you like but might not have much history for yet. You set an initial weight using the same 5-bar picker. Grounding tags are pinned permanently — they won't be removed by re-syncs — and are displayed separately with a pin icon. Once a sync has processed them, they appear alongside the computed tags and can be removed at any time.
+
+### YouTube Playlists
+A `/playlists` page for managing YouTube playlists as per-user taste signals. Playlists are scoped to a user profile — each user can have their own set. From this page you can add playlist IDs, remove them, enable/disable individual playlists, and trigger a Google Takeout watch-history JSON import. Enabled playlists are synced on each regular sync cycle and their video watch history contributes to that user's taste profile.
+
+### Utilities
+A utilities page with maintenance actions:
+- **Clear API cache** — purges all cached API responses so the next sync fetches fresh data from all external services
+- **Purge source data** — remove all data ingested from a specific service (e.g. purge all Last.fm data, or all Plex data) without affecting data from other sources. Useful when re-configuring a source or switching accounts.
 
 ### Status
 The Status page has two sections:
@@ -237,15 +247,37 @@ After building the taste profile, the engine scores candidates from external dis
 
 ### Music recommendations
 
-Using the Last.fm API, the engine fetches "similar artists" for the artists in your library. It then scores each candidate by how well its tags align with your music taste profile. Artists already in your Lidarr library are excluded. A release window filter (optional) can restrict to albums released after a certain year, which is useful for surfacing "albums you don't own yet from artists you already like."
+The engine runs five distinct strategies and merges the results:
+
+1. **Tag-based artist discovery** — Queries Last.fm for the top artists tagged with each of your top music genres.
+2. **Similar-artist exploration** — Fetches Last.fm similar-artist lists for your most-listened artists, then scores candidates by tag overlap with your profile.
+3. **Tag-based album discovery** — Queries Last.fm for top albums tagged with your top genres.
+4. **Collection gap finder** — Identifies artists already in your Lidarr library and finds their albums you don't own yet. Optionally filters to albums released after a configured year (surfacing "recent releases from artists you like").
+5. **Band-member web** — Two-hop MusicBrainz traversal: takes artists in your library, finds their members, then finds other bands or projects those members belong to. Surfaces side projects and related acts you may not know.
+
+Artists/albums already in your Lidarr library are excluded from all strategies.
 
 ### Movie recommendations
 
-Using TMDb's discover and similar-movie APIs, the engine fetches candidates based on genres and keywords matching your movie taste profile. Movies already in your Radarr library are excluded. Year range filters (min and max) apply.
+The engine runs six strategies:
+
+1. **Genre discover** — TMDb discover API filtered by your top movie taste tags.
+2. **Similar-title seeding** — TMDb similar-movies lookup seeded from your top-rated library films.
+3. **Cast discovery** — Top 8 library films → top-billed cast → their other films.
+4. **Crew discovery** — Top 8 library films → directors, writers, and producers → their other films. Directors are weighted more heavily than other crew.
+5. **Production company discovery** — Top 6 highest-rated library films → their studios → other releases from those studios.
+6. **Hidden gems** — High-rated (≥7.0) but low-vote-count films in your top genres, surfacing obscure titles.
+
+Movies already in your Radarr library are excluded. Year range filters (min and max) apply.
 
 ### TV recommendations
 
-Similar to movies: TMDb discover and similar-show lookups filtered against your TV taste profile, with Sonarr library exclusion and optional year range filtering.
+The engine runs two strategies:
+
+1. **Genre discover** — TMDb discover API filtered by your top TV taste tags.
+2. **Similar-title seeding** — TMDb similar-shows lookup seeded from your library.
+
+Shows already in your Sonarr library are excluded. Year range filters (min and max) apply.
 
 ### Scoring
 
@@ -273,7 +305,7 @@ Clicking a search result opens that artist as a **node card** in a vertically-st
 - An icon area — if Lidarr is configured, this is replaced with the artist's actual photo fetched from Lidarr's metadata server
 - Genre/style tag pills (from MusicBrainz tags)
 - An "Add to Lidarr" button — if the artist is already in your library, this becomes a green "In Lidarr" indicator instead
-- Streaming service links (Spotify, Apple Music, YouTube Music, Tidal, Amazon Music — whichever you've enabled in config)
+- Streaming service links (Spotify, Apple Music, YouTube Music, Tidal, Amazon Music, Bandcamp — whichever you've enabled in config)
 - A YouTube preview button
 - A MusicBrainz link
 
@@ -327,6 +359,7 @@ The Movie Explorer follows the same node-card chain pattern as the Music Explore
 - Title, year, rating, overview/description
 - Genre tags
 - Cast members as clickable pills — clicking a cast member opens a **Person card** for that actor
+- Key crew as clickable pills (director, writers, producers) — clicking one opens a **Person card** for that crew member
 - Production companies as clickable pills — clicking one opens a **Company card** showing other movies from that studio
 - Links to TMDb, Metacritic, IMDb, and JustWatch
 - A "Add to Radarr" button — links to Radarr's add-movie search for that film
@@ -354,6 +387,7 @@ The TV Explorer mirrors the Movie Explorer in structure and UX, adapted for tele
 - Title, year, rating, overview
 - Genre tags
 - Cast as clickable pills → Person cards (with TV credits)
+- Key crew as clickable pills (creator, directors) → Person cards
 - Networks as clickable pills → Network cards (showing other shows on that network)
 - Links to TMDb, Metacritic, TVDB, and JustWatch
 - A "Add to Sonarr" button
@@ -380,19 +414,22 @@ These are services shared across all users:
 - **Sonarr** — URL and API key for your Sonarr instance
 - **Lidarr** — URL and API key for your Lidarr instance
 - **TMDb** — API key for The Movie Database (required for movie/TV recommendations and explorers)
+- **TVDB** — API key for TheTVDB (supplemental TV metadata)
 - **MusicBrainz** — user agent string (MusicBrainz requires a descriptive user agent; no key needed)
 - **Last.fm** — global API key (used for artist tag enrichment and music recommendations)
-- **Streaming services** — which services to show link buttons for (Spotify, Apple Music, YouTube Music, Tidal, Amazon Music), toggled on/off per service
+- **Streaming services** — which services to show link buttons for (Spotify, Apple Music, YouTube Music, Tidal, Amazon Music, Bandcamp), toggled on/off per service. These are search links only — no API keys needed.
 
 ### Profiles (per-user)
 
 Each user can have their own set of data sources. A profile entry in config.yaml includes:
-- **Last.fm** — username (and optional API key override), toggle enabled/disabled
-- **ListenBrainz** — username, toggle
-- **Plex** — server URL + X-Plex-Token (this is the per-user Plex token, not a shared server token), toggle
-- **Watcharr** — server URL + API key, toggle
-- **YouTube** — path to the Google Takeout history JSON file, toggle
-- **Local media** — paths to local media directories, toggle
+- **Last.fm** — username + API key, toggle enabled/disabled
+- **ListenBrainz** — username, toggle (no API key required)
+- **Plex** — server URL + X-Plex-Token (per-user token, not shared server token). Options: import rated items, import playlists, import watch history, minimum star rating filter, and per-library scrobbling with declared media type (music/movies/tv)
+- **Watcharr** — server URL + username + password, toggle
+- **YouTube** — API key for playlist sync; separate `import_history_enabled` flag for Google Takeout JSON import
+- **TMDb personal account** — session_id + username (imports your TMDb ratings and watchlist; requires the infrastructure TMDb API key to be set)
+- **TVDB personal account** — user_pin (imports your TVDB favourites and ratings; requires the infrastructure TVDB API key)
+- **Local media** — separate paths for music, movies, and TV directories. Presence of files is treated as a taste signal; no play-count history is recorded.
 
 Profiles defined in `config.yaml` can be imported into the database from the User Profiles page. The database and config.yaml are kept in sync — the UI warns you if they diverge.
 

@@ -177,6 +177,8 @@ An open-source alternative to Last.fm. Configure a user's ListenBrainz username 
 **Plex (music):**
 Using a user-specific Plex X-Plex-Token (a per-user API token from your Plex server), the app can pull the user's Plex play history for music. Each user provides their own token, so play history stays private per-person.
 
+Direct the user to collect their Plex-X-Token by following these instructions: [https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/]
+
 **Local media scanner:**
 Can scan a local music library path and register what's present, feeding it into the profile.
 
@@ -188,8 +190,6 @@ The same Plex X-Plex-Token used for music also covers movies and TV — the app 
 **Watcharr:**
 Watcharr is a self-hosted watch-tracking app. If you use it, the app can pull your watched/rated movie and show lists from its API.
 
-**YouTube History:**
-If you export your YouTube watch history (Google Takeout), the app can parse it and use it as a signal for video content preferences.
 
 ### Infrastructure Sources (global/shared)
 
@@ -211,8 +211,8 @@ The taste profile is the heart of recommendarr. It answers the question: "given 
 
 When a sync runs, the builder collects all known items for a user from their enabled sources. For each item (artist, movie, show), it looks up associated tags:
 - For music: Last.fm genre/style tags fetched via API (or enrichment), MusicBrainz tags
-- For movies: TMDb genre names, keyword tags
-- For TV: TMDb genre names
+- For movies: TMDb genre names, keyword tags, actor names, director names
+- For TV: TMDb genre names, production companies, executive producer
 
 Tags that describe user behavior rather than content style ("seen live", "favorites", "awesome", "love", etc.) are filtered out automatically. Only meaningful content descriptors contribute.
 
@@ -220,7 +220,7 @@ Tags that describe user behavior rather than content style ("seen live", "favori
 
 Tags are weighted based on how many items carry them and how frequently those items appear in the user's history. The more you listen to artists tagged "shoegaze", the higher "shoegaze" scores in your music profile. The weights are then normalized so the top tag = 100% and all others are proportional. This normalized weight is what's stored and displayed.
 
-The top 30 music tags and top 20 movie/TV tags are kept active for recommendations.
+The top 25 music tags and top 25 movie/TV tags are kept active for recommendations, as well as any grounding tags the user has specified for that user profile.
 
 ### User override bars
 
@@ -257,7 +257,7 @@ The engine runs five distinct strategies and merges the results:
 2. **Similar-artist exploration** — Fetches Last.fm similar-artist lists for your most-listened artists, then scores candidates by tag overlap with your profile.
 3. **Tag-based album discovery** — Queries Last.fm for top albums tagged with your top genres.
 4. **Collection gap finder** — Identifies artists already in your Lidarr library and finds their albums you don't own yet. Optionally filters to albums released after a configured year (surfacing "recent releases from artists you like").
-5. **Band-member web** — Two-hop MusicBrainz traversal: takes artists in your library, finds their members, then finds other bands or projects those members belong to. Surfaces side projects and related acts you may not know.
+5. **Band-member web** — Three-hop MusicBrainz traversal: takes artists in your library, finds their members, then finds other bands or projects those members belong to. Surfaces side projects and related acts you may not know.
 
 Artists/albums already in your Lidarr library are excluded from all strategies.
 
@@ -336,7 +336,11 @@ Clicking a song pill opens a **Song card** as the next node in the chain. Song c
 
 ### Local caching & refresh
 
-All data fetched while browsing — artist details, relationships, albums, tracks — is stored in the local database. When you revisit the same artist, data loads instantly from the DB rather than hitting external APIs. A **Refresh** button on each card forces a fresh fetch from the live API and updates the local cache, so you can always get the latest data when you want it.
+All data fetched while browsing — artist details, relationships, albums, tracks — is stored in the local database with a timestamp recording when the data was last fetched. When you revisit the same artist, data loads instantly from the DB rather than hitting external APIs.
+
+Each node card displays a small **cache age indicator** — a subtle widget in the card header showing how long ago the data was fetched (e.g. "cached 3 days ago", "cached 14 days ago"). This gives you an at-a-glance sense of whether the data is likely still current. Clicking this widget triggers a live re-fetch from the API, updates the local cache, and refreshes the card in place — it is the primary way to pull fresh data for a specific card without affecting the rest of the chain.
+
+Cached data is not considered fresh forever. Cards whose cached data is older than 30 days should display the age indicator in a visually distinct way (e.g. a warning color) to signal that the data may be stale and is worth refreshing. The app does not auto-refresh explorer cache in the background — refreshes are always user-initiated — but the staleness indicator ensures you know when it would be worthwhile.
 
 ### Chain navigation
 
@@ -377,7 +381,7 @@ The Movie Explorer follows the same node-card chain pattern as the Music Explore
 - The production company name
 - A list of notable movies from that company as clickable pills
 
-All browsed data is stored locally for instant re-access.
+All browsed data is stored locally with a timestamp. Each card displays a **cache age indicator** in its header showing how long ago the data was fetched. Clicking the indicator triggers a live re-fetch from TMDb and refreshes the card in place. Cards whose data is older than 30 days display the age indicator in a warning color to signal the data may be stale.
 
 ---
 
@@ -401,7 +405,7 @@ The TV Explorer mirrors the Movie Explorer in structure and UX, adapted for tele
 
 **Network cards** use TMDb's discover API to show other shows from the same network.
 
-All browsed data is stored locally and can be refreshed on demand.
+All browsed data is stored locally with a timestamp. Each card displays a **cache age indicator** in its header showing how long ago the data was fetched. Clicking the indicator triggers a live re-fetch from TMDb and refreshes the card in place. Cards whose data is older than 30 days display the age indicator in a warning color to signal the data may be stale.
 
 ---
 
@@ -482,7 +486,7 @@ User searches in Music/Movie/TV Explorer
          ↓ (on miss)
    Fetch from MusicBrainz / TMDb / Last.fm API
          ↓
-   Store in local DB (permanent cache, refreshable on demand)
+   Store in local DB (timestamped cache, age shown in UI, refreshable on demand)
          ↓
    Rendered as node card in explorer chain
 ```
@@ -491,7 +495,7 @@ User searches in Music/Movie/TV Explorer
 
 ## Key Design Decisions
 
-- **Everything is cached locally.** API calls are only made on first access; subsequent loads are instant from the DB. You can always force a refresh.
+- **Everything is cached locally, but cache age is visible.** API calls are only made on first access; subsequent loads are instant from the DB. Every cached card shows how old its data is, highlights stale entries (>30 days), and lets you refresh a specific card with one click.
 - **Per-user isolation.** Taste profiles, recommendations, and scrobble histories are fully isolated per user. Infrastructure (owned media libraries) is shared.
 - **Grounding prevents cold-start problems.** New users don't have to wait weeks of listening before recommendations are meaningful — they can manually seed their profile.
 - **Override bars give tuning power without complexity.** You don't set numeric weights; you just move bars up or down. The UI is self-explanatory.

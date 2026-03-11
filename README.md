@@ -1,6 +1,6 @@
 # Please read this part
 #
-# I had Claude generate this repo, but I read every word. I changed multiple things to make them clearer. I mofidified things I didn't like. **YOU SHOULD DO THE SAME THING**
+# I had Claude generate this repo based off my working application, but I read every word in this markdown. I changed multiple things to make them clearer. I mofidified things I didn't like. **YOU SHOULD DO THE SAME THING**
 #
 # Note from LoTek - The template author
 I'm trying something new here. I built an app I called 'lotek-recomendarr' that meets my demanding needs for a media recommender. Rather than poisoning the world with more vibe coded slop, I've created an outline that SHOULD help you create a version of this application tailored to your specifications.

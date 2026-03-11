@@ -214,6 +214,14 @@ Navigate to the login page. Enter a valid username with an incorrect password an
 
 Open the Music Explorer. Search for an artist, open their card, and click Load Albums. Wait for the full discography to appear. Close the browser tab entirely. Reopen the app in a new tab and navigate to the Music Explorer. Search for the same artist and open their card. Confirm the card loads instantly without a visible loading state. Click Load Albums. Confirm the album list also appears instantly from the local database cache.
 
-### TC-CACHE-02: use the refresh button on an artist card to force a live fetch and update stale cached data
+### TC-CACHE-02: confirm the cache age indicator appears on a previously browsed card and shows the correct age
 
-Open the Music Explorer. Search for an artist you have browsed before so their data is cached. Confirm the card loads instantly. Click the Refresh button on the card. Confirm a loading indicator appears while data is fetched live from MusicBrainz. Confirm the card content updates with any changed tags, member list corrections, or other new information. Confirm subsequent loads of the same artist are again instant from the newly updated cache.
+Open the Music Explorer. Search for an artist you have browsed before so their data is already cached. Open their card. Confirm a cache age indicator is visible in the card header showing how long ago the data was fetched, such as "cached 2 days ago". Confirm the indicator is present on Movie Explorer and TV Explorer cards as well when browsing previously viewed content. Confirm the age reflects the actual time elapsed since the data was first fetched or last refreshed.
+
+### TC-CACHE-03: click the cache age indicator to force a live re-fetch and confirm the card updates
+
+Open the Music Explorer. Open a card for an artist whose data is cached. Note the current tag pills or member list. Click the cache age indicator in the card header. Confirm a loading state appears on the card while the fetch is in progress. Confirm the card content refreshes when the fetch completes. Confirm the cache age indicator resets to show a fresh fetch time such as "cached just now". Confirm subsequent loads of the same artist are again instant from the newly updated cache.
+
+### TC-CACHE-04: confirm cards with data older than 30 days display the age indicator in a warning state
+
+This test requires manipulating the cache timestamp directly in the database or waiting for 30 days to elapse. Set the cached_at timestamp for a browsed artist record to a date more than 30 days in the past. Open the Music Explorer and open that artist's card. Confirm the cache age indicator is displayed in a visually distinct warning style compared to a freshly cached card, such as an amber or red color. Confirm the same warning behavior applies to Movie Explorer and TV Explorer cards with equivalently stale timestamps.

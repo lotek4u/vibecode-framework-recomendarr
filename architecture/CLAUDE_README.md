@@ -176,7 +176,7 @@ A few areas where early mistakes are expensive:
 
 **Chain navigation in the explorers** — The pattern where clicking within a card opens the next card below it, and closing a card collapses it and everything after it, is the core interaction of all three explorers. Build it correctly in the Music Explorer (Phase 10) and the Movie and TV Explorers are adaptations of the same pattern.
 
-**Local caching** — Every API response from MusicBrainz, TMDb, and Last.fm that is fetched during explorer browsing must be written to the local database. Subsequent loads must come from the DB. A Refresh button must force a live re-fetch. Do not skip this — it is what makes the explorers usable.
+**Local caching** — Every API response from MusicBrainz, TMDb, and Last.fm that is fetched during explorer browsing must be written to the local database with a fetch timestamp. Subsequent loads must come from the DB. Every card must display a cache age indicator showing how old the data is; clicking it triggers a live re-fetch and updates the cache. Cards older than 30 days must display the age indicator in a warning state. Do not skip any of this — it is what makes the explorers usable and trustworthy over time.
 
 **Schema must be additive** — Never drop or alter existing tables. Only add new ones or new columns. This ensures the app can be updated without data loss.
 

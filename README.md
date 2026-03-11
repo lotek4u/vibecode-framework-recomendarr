@@ -1,21 +1,33 @@
 # Please read this part
 #
+# I had claude generate this repo, but I read every word. I changed this to make them clear, I mofidified things I didn't like. **YOU SHOULD DO THE SAME THING**
 #
 # Note from LoTek
-I'm trying something new here. I built a great app called recomendarr that meets my demanding needs for a media recommender. Rather than poisoning the world with more vibe coded slop, i've created an outline that SHOULD help you create a copy of this application.
+I'm trying something new here. I built an app I called 'lotek-recomendarr' that meets my demanding needs for a media recommender. Rather than poisoning the world with more vibe coded slop, I've created an outline that SHOULD help you create a version of this application tailored to your specifications.
+
+---
 
 **Before you do anything — read all of the markdown in this project.** That means this file, everything in [`architecture/`](architecture/), the READMEs inside [`config/imported_data/`](config/imported_data/), and any other `.md` files you find. The whole picture matters. Don't just skim the overview and start generating code — the context is spread across multiple files intentionally.
 
 It's going to create what you specify, specify what you want. My exact specifications might not be what you're looking for.
 
+---
+
 **EXAMPLE 1** - In the CLAUDE_README.md file, the colors and layout are specific in demanding detail. You may want to prune or modify this section.
+
+---
+
 **EXAMPLE 2** - The test cases, onsider starting without them entirely, or pruning them down to the features you actually care about before feeding to your agent.
+
+---
 
 ## How to Get Claude Code Running
 
 Claude Code is Anthropic's official agentic coding CLI. It runs in your terminal and gives Claude direct access to your filesystem, shell, and editor so it can read code, write files, run commands, and work through complex tasks autonomously.
 
 The official documentation is at: https://docs.anthropic.com/en/docs/claude-code/overview
+
+---
 
 ### Environment recomendations
 - If you have a native Linux of MacOS device, use that
